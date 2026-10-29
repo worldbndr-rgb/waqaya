@@ -41,6 +41,7 @@ jobs:
           mkdir _site
           cp -R site/index.html site/css site/js site/pages site/data _site/
           touch _site/.nojekyll
+          python3 -c 'import os,pathlib,re; [p.write_text(re.sub(r"(\.\.?/[^\s\x22\x27]+\.(?:js|css))([\x22\x27])",lambda m:m[1]+"?v="+os.environ["GITHUB_SHA"]+m[2],p.read_text())) for p in pathlib.Path("_site").rglob("*") if p.suffix in (".html",".js")]'
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
