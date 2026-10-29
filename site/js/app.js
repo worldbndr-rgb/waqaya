@@ -328,6 +328,7 @@ function initQuiz() {
     const pct = Math.round((score / deck.length) * 100);
     const color = pct >= 75 ? 'var(--emerald)' : pct >= 50 ? 'var(--amber)' : 'var(--rose)';
     const msg = pct >= 75 ? 'وعيك الأمني مرتفع—استمر وشارك المعرفة.' : pct >= 50 ? 'أساس جيد، راجع أقسام الحماية لترفع جاهزيتك.' : 'ابدأ بقسمَي "أنواع التصيّد" و"الحماية"، ثم أعد الاختبار.';
+    const prior = Store.getQuiz().at(-1);
     Store.saveQuiz(score, deck.length);
     window.dispatchEvent(new Event('wiqaya:progress'));
     const topics = [...new Set(missed.map(q => q.topic).filter(Boolean))];
@@ -335,6 +336,8 @@ function initQuiz() {
       <div class="quiz-result">
         <div class="ring" style="color:${color}">${score}/${deck.length}</div>
         <p style="color:var(--muted);margin:8px 0 6px">النتيجة ${pct}%</p>
+        <p class="quiz-comparison" role="status">${prior ? `المحاولة السابقة: ${prior.pct}% · الفرق: ${pct-prior.pct>0?'+':''}${pct-prior.pct} نقطة مئوية.` : 'هذه نقطة البداية. راجع الشرح ثم أعد المحاولة لمقارنة أدائك.'}</p>
+        <p style="color:var(--muted);font-size:.85rem">مؤشر تدريبي محلي؛ تختلف الأسئلة وقد يؤثر تذكّر الإجابات. لا يثبت الفرق وحده أثر التدريب أو الجاهزية المهنية.</p>
         <p style="font-weight:700;max-width:40ch;margin:0 auto 18px">${msg}</p>
         ${topics.length ? `<p style="color:var(--muted);font-size:.92rem;margin:0 auto 18px;max-width:48ch"><i class="fas fa-bullseye"></i> محاور تحتاج مراجعة: <b style="color:var(--amber)">${topics.join('، ')}</b></p>` : ''}
         <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
