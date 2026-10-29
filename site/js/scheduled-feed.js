@@ -11,7 +11,7 @@ export async function fetchSnapshot(path = '../data/threats.json') {
     const lists=data.lists.filter(x=>x && typeof x.source==='string' && Array.isArray(x.urls))
       .map(x=>({source:x.source,urls:x.urls.filter(u=>typeof u==='string' && /^https?:\/\//i.test(u))}));
     if(!lists.length)throw new Error('empty snapshot');
-    return {at:data.at,lists,sources:data.sources||lists.map(x=>x.source),
+    return {at:data.at,lists,sourceStatus:data.sourceStatus||{},disabled:data.disabled||[],sources:data.sources||lists.map(x=>x.source),
       failed:Array.isArray(data.failed)?data.failed:[]};
   } finally{clearTimeout(timeout)}
 }
