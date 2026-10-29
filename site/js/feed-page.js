@@ -54,6 +54,19 @@ async function refresh(manual = false) {
     btn.querySelector('i').classList.remove('fa-spin');
     nextAt=Date.now()+REFRESH_MS;
     const newCount=apply(snapshot.lists,snapshot.at,true);
+    const details = document.getElementById('source-health') || document.createElement('div');
+    details.id = 'source-health';
+    details.setAttribute('role', 'status');
+    details.style.cssText = 'margin:16px 0;padding:16px;border:1px solid currentColor;border-radius:12px;line-height:2';
+    details.replaceChildren();
+    const heading = document.createElement('strong'); heading.textContent = 'حالة المصادر — آخر جلب ناجح (وليس وقت اكتشاف التهديد)'; details.append(heading);
+    for (const [source, health] of Object.entries(snapshot.sourceStatus)) {
+      const row = document.createElement('div');
+      row.textContent = `${source}: ${health.ok ? 'متاح' : health.cached ? 'تعذّر الجلب — نسخة محفوظة' : 'غير متاح'} · ${health.lastSuccessAt ? new Date(health.lastSuccessAt).toLocaleString('ar-SA') : 'لم يُسجّل جلب ناجح'}`;
+      details.append(row);
+    }
+    if (snapshot.disabled.length) {const row=document.createElement('div');row.textContent='URLhaus غير مفعّل: يحتاج مفتاح API.';details.append(row);}
+    document.getElementById('feed-status').after(details);
     liveLoaded=true;
     Store.saveFeed({at:snapshot.at,lists:snapshot.lists});
     const stale=Date.now()-snapshot.at>60*60*1000;
@@ -147,7 +160,7 @@ function renderStats() {
 
   const counts = {};
   items.forEach(i => { counts[i.source] = (counts[i.source] || 0) + 1; });
-  FEEDS.forEach(f => { const el = $(`#src-${f.id}`); if (el) el.textContent = counts[f.id] ? n(counts[f.id]) : '—'; });
+  document.querySelectorAll('[id^=src-]').forEach(el => {el.textContent=n(counts[el.id.slice(4)]||0);});
 }
 
 function filtered() {
@@ -164,7 +177,7 @@ function renderList() {
   $('#feed-count').textContent = `${list.length.toLocaleString('ar-EG')} نتيجة`;
   const box = $('#feed-list');
   if (!list.length) { box.innerHTML = '<div class="empty">لا نتائج مطابقة.</div>'; $('#feed-more').hidden = true; return; }
-  const srcName = Object.fromEntries(FEEDS.map(f => [f.id, f.name]));
+  const srcName = {...Object.fromEntries(FEEDS.map(f => [f.id, f.name])),phishunt:'Phishunt',urlhaus:'URLhaus'};
   box.innerHTML = list.slice(0, shown).map(i => `
     <div class="feed-row${i.isNew ? ' is-new' : ''}">
       <div class="fr-main">
