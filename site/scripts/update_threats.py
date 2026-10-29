@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Scheduled phishing feed snapshot; standard library only. Never visits listed URLs."""
 import json
+import csv
+import io
 import os
 import pathlib
 import tempfile
@@ -18,6 +20,7 @@ FEEDS = [
     ]),
 ]
 MAX_ITEMS_PER_SOURCE = 30000
+URLHAUS_FEED = "https://urlhaus.abuse.ch/downloads/csv_recent/"
 MAX_RESPONSE_BYTES = 12 * 1024 * 1024
 
 def parse(raw):
@@ -52,6 +55,37 @@ def get_feed(url):
         raise ValueError("Empty or invalid feed")
     return urls
 
+def get_urlhaus():
+    """Download URLhaus recent CSV; URLs are data only, never opened."""
+    req = Request(URLHAUS_FEED, headers={"User-Agent": "WaqayaThreatUpdater/2.0", "Accept": "text/csv"})
+    with urlopen(req, timeout=35) as response:
+        raw = response.read(MAX_RESPONSE_BYTES + 1)
+    if len(raw) > MAX_RESPONSE_BYTES:
+        raise ValueError("URLhaus response too large")
+    text = raw.decode("utf-8-sig", errors="replace")
+    urls, seen = [], set()
+    for row in csv.reader(io.StringIO(text)):
+        if not row or row[0].lstrip().startswith("#") or len(row) < 3:
+            continue
+        u = row[2].strip()
+        if not u or any(c.isspace() for c in u) or len(u) > 4096:
+            continue
+        try:
+            parsed = urlsplit(u)
+            if parsed.scheme not in ("http", "https") or not parsed.hostname or parsed.username or parsed.password:
+                continue
+        except ValueError:
+            continue
+        if u not in seen:
+            seen.add(u)
+            urls.append(u)
+        if len(urls) >= MAX_ITEMS_PER_SOURCE:
+            break
+    if not urls:
+        raise ValueError("URLhaus CSV empty or incompatible; check feed access")
+    return urls
+
+
 def main():
     previous = {}
     if DEST.exists():
@@ -76,6 +110,15 @@ def main():
             urls = previous_lists.get(source, [])
         if urls:
             merged.append({"source": source, "urls": urls})
+    try:
+        malware_urls = get_urlhaus()
+        merged.append({"source": "urlhaus", "urls": malware_urls})
+        successes += 1
+    except Exception as exc:
+        print(f"urlhaus: {type(exc).__name__}: {exc}")
+        failures.append("urlhaus")
+        if previous_lists.get("urlhaus"):
+            merged.append({"source": "urlhaus", "urls": previous_lists["urlhaus"]})
     if not successes:
         raise RuntimeError("No live source succeeded: refusing to rewrite snapshot")
     if not merged:
