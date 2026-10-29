@@ -41,7 +41,7 @@
       <div class="section-head">
         <span class="kicker"><i class="fas fa-tower-broadcast"></i> استخبارات تهديدات مباشرة</span>
         <h2>المواقع المشبوهة الآن</h2>
-        <p>روابط تصيّد وروابط مرتبطة ببرمجيات خبيثة من قواعد بيانات عامة، تُجلب مباشرة من قوائم يحدّثها باحثو الأمن السيبراني وتتجدّد تلقائياً كل ١٠ دقائق.</p>
+        <p>تُجلب قوائم المصادر وتنشر آليًا كل ١٥ دقيقة تقريبًا، وتفحص الصفحة النسخة المنشورة كل ١٠ دقائق. لكل مصدر وتيرة تحديث مستقلة؛ وقت الجلب لا يعني اكتشاف تهديدات جديدة.</p>
       </div>
 
       <div class="sim-warn" style="max-width:none;margin-bottom:22px">
@@ -90,7 +90,7 @@
             <option value="all">كل المصادر</option>
             <option value="openphish">OpenPhish</option>
             <option value="phishdb">Phishing.Database</option>
-            <option value="urlhaus">URLhaus — روابط برمجيات خبيثة</option>
+            <option value="phishunt">Phishunt — إشارات متعددة المصادر</option>
           </select>
           <label class="chk"><input type="checkbox" id="feed-sa"> تستهدف السعودية</label>
           <label class="chk"><input type="checkbox" id="feed-new"> الجديد فقط</label>
@@ -105,8 +105,9 @@
         <ul>
           <li><b>OpenPhish Community Feed</b> — <span id="src-openphish">—</span> رابط · تُحدَّث كل ١٢ ساعة · للاستخدام غير التجاري. <span class="mono" dir="ltr">openphish.com</span></li>
           <li><b>Phishing.Database</b> — <span id="src-phishdb">—</span> رابط · روابط جديدة مكتشفة اليوم، مفحوصة آلياً بأداة PyFunceble · رخصة MIT. <span class="mono" dir="ltr">github.com/Phishing-Database</span></li>
+          <li><b><a href="https://phishunt.io/feed/" target="_blank" rel="noopener">Phishunt</a></b> — <span id="src-phishunt">—</span> رابط · المصدر يتحدث كل ساعة؛ نختار سجلات آخر ٧ أيام التي تحمل إشارة Google Safe Browsing أو OpenPhish أو PhishTank بحسب Phishunt. هذه إشارات مجمعة وليست تحققًا مستقلاً أو حكمًا قطعيًا.</li>
         </ul>
-        <p>تُجلب البيانات مباشرة من متصفحك إلى هذه المصادر؛ لا يمرّ شيء عبر خادم خاص بنا. تحديد «الجهة المستهدفة» تقديري بناءً على الكلمات الظاهرة في الرابط. لإبلاغ عن موقع احتيالي في السعودية: أعد توجيه الرسالة إلى <b>330330</b> أو بلّغ عبر «كلنا أمن».</p>
+        <p>النسخة الأساسية تُجمع بواسطة GitHub Actions وتُنشر مع الموقع. عند تعذّر النسخة قد يحاول المتصفح جلب المصادر مباشرة. URLhaus غير مفعّل لاحتياجه إلى مفتاح API. جميع القوائم قد تتضمن أخطاء أو روابط تغيّرت حالتها. تحديد «الجهة المستهدفة» تقديري بناءً على الكلمات الظاهرة في الرابط. لإبلاغ عن موقع احتيالي في السعودية: أعد توجيه الرسالة إلى <b>330330</b> أو بلّغ عبر «كلنا أمن».</p>
       </div>
     </div>
   </section>
