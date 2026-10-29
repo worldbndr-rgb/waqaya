@@ -39,8 +39,11 @@ export async function syncThreats(force=false){
 }
 export function threatMatch(url,data=current||getThreatCache()){
  if(!data?.urls)return null;
- let target;
- try {const u=new URL(url);target=(u.origin+u.pathname).replace(/\/$/,'').toLowerCase()}catch{return null}
- const matched=data.urls.some(x=>{try {const u=new URL(x);return (u.origin+u.pathname).replace(/\/$/,'').toLowerCase()===target}catch{return false}});
+ const key = value => {
+   try {const u=new URL(value);if(!['http:','https:'].includes(u.protocol))return null;u.hash='';return u.href;} catch{return null;}
+ };
+ const target=key(url);
+ if(!target)return null;
+ const matched=data.urls.some(value=>key(value)===target);
  return matched?{matched:true,at:data.at}:null;
 }
