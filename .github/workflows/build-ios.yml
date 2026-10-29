@@ -1,0 +1,82 @@
+name: Build Waqaya iPhone IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ios-ipa-build]
+    paths: [waqaya-ios-source.zip]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Select Xcode 26 or newer
+        run: |
+          python3 - <<'PY'
+          import glob, os, re
+          def version(p): return tuple(map(int, re.findall(r'\d+', os.path.basename(p))))
+          candidates = [p for p in glob.glob('/Applications/Xcode_*.app') if version(p) >= (26,)]
+          if not candidates: raise SystemExit('Xcode 26+ is required')
+          selected = max(candidates, key=version)
+          with open(os.environ['GITHUB_ENV'], 'a') as f:
+              f.write('DEVELOPER_DIR=' + selected + '/Contents/Developer\n')
+          print(selected)
+          PY
+      - name: Extract iOS source
+        run: unzip -q waqaya-ios-source.zip
+      - name: Install locked dependencies
+        working-directory: mobile
+        run: npm ci
+      - name: Verify mobile app
+        working-directory: mobile
+        run: |
+          npm test
+          node scripts/quiz-test.mjs
+          npm run audit
+      - name: Sync iOS project
+        working-directory: mobile
+        run: npx cap sync ios
+      - name: Build for physical iPhone without signing
+        run: |
+          set -o pipefail
+          xcodebuild -version
+          xcodebuild -project mobile/ios/App/App.xcodeproj -scheme App -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' build 2>&1 | tee build-ios.log
+      - name: Package unsigned IPA for Sideloadly
+        run: |
+          APP=build/DerivedData/Build/Products/Release-iphoneos/App.app
+          test -d "$APP"
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist"
+          xcrun lipo -archs "$APP/App" | grep -w arm64
+          mkdir -p build/package/Payload
+          ditto "$APP" build/package/Payload/App.app
+          cd build/package
+          /usr/bin/zip -qry ../waqaya-unsigned.ipa Payload
+          cd ..
+          shasum -a 256 waqaya-unsigned.ipa > SHA256SUMS.txt
+          echo 'Unsigned physical-device IPA. Re-sign with Sideloadly and your own Apple account.' > INSTALL.txt
+      - name: Upload iPhone IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: waqaya-iphone-unsigned
+          path: |
+            build/waqaya-unsigned.ipa
+            build/SHA256SUMS.txt
+            build/INSTALL.txt
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: waqaya-ios-build-log
+          path: build-ios.log
+          if-no-files-found: ignore
+          retention-days: 3
