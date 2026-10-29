@@ -1,43 +1,49 @@
-
-name: Refresh phishing data
+name: Publish Waqaya and refresh threat data
 
 on:
+  push:
+    branches: [main]
+    paths: ['site/**', '.github/workflows/update-threats.yml']
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: '7,22,37,52 * * * *'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
-  group: threat-feed-update
+  group: waqaya-pages
   cancel-in-progress: false
 
 jobs:
-  update:
+  publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Update phishing database
+      - uses: actions/checkout@v4
+      - name: Restore last published snapshot for source outages
         run: |
-          if [ -f site/scripts/update_threats.py ]; then
-            python3 site/scripts/update_threats.py
-          elif [ -f scripts/update_threats.py ]; then
-            python3 scripts/update_threats.py
-          else
-            echo "Threat updater script not found"
-            exit 1
-          fi
-
-      - name: Save updated database
+          curl --fail --silent --show-error --max-time 30 https://worldbndr-rgb.github.io/waqaya/data/threats.json -o /tmp/previous-threats.json && python3 -c 'import json; d=json.load(open("/tmp/previous-threats.json")); assert d.get("schema")==1 and d.get("lists")' && cp /tmp/previous-threats.json site/data/threats.json || true
+      - name: Refresh threat snapshot
+        run: python3 site/scripts/update_threats.py
+      - name: Validate static site and snapshot
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A -- ':(glob)**/data/threats.json'
-          if ! git diff --cached --quiet; then
-            git commit -m "chore: update phishing database"
-            git push
-          fi
+          python3 -m py_compile site/scripts/update_threats.py
+          python3 -c 'import json; d=json.load(open("site/data/threats.json")); assert d["schema"]==1 and d["at"]>0 and d["lists"]; print("Validated snapshot:",sum(len(x["urls"]) for x in d["lists"]),"URLs; failed sources:",d["failed"])'
+      - uses: actions/configure-pages@v5
+      - name: Prepare public files only
+        run: |
+          mkdir _site
+          cp -R site/index.html site/css site/js site/pages site/data _site/
+          touch _site/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - name: Publish GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
