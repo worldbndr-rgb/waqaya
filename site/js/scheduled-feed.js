@@ -3,7 +3,7 @@ export async function fetchSnapshot(path = '../data/threats.json') {
   const controller=new AbortController();
   const timeout=setTimeout(()=>controller.abort(),15000);
   try{
-    const response=await fetch(path,{cache:'no-store',signal:controller.signal});
+    const response=await fetch(new URL('../data/threats.json', import.meta.url),{cache:'no-store',signal:controller.signal});
     if(!response.ok)throw new Error('snapshot HTTP '+response.status);
     const data=await response.json();
     if(data.schema!==1 || !Number.isFinite(data.at) || !Array.isArray(data.lists) || !data.lists.length)
