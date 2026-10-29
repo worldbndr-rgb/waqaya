@@ -20,7 +20,8 @@ FEEDS = [
     ]),
 ]
 MAX_ITEMS_PER_SOURCE = 30000
-URLHAUS_FEED = "https://urlhaus.abuse.ch/downloads/csv_recent/"
+URLHAUS_KEY = os.environ.get("URLHAUS_AUTH_KEY", "")
+URLHAUS_FEED = "https://urlhaus-api.abuse.ch/v2/files/exports/" + URLHAUS_KEY + "/recent.csv"
 MAX_RESPONSE_BYTES = 12 * 1024 * 1024
 
 def parse(raw):
@@ -54,6 +55,34 @@ def get_feed(url):
     if not urls:
         raise ValueError("Empty or invalid feed")
     return urls
+
+def get_phishunt():
+    """Supplementary aggregator: keep only independently flagged, recent records."""
+    req = Request("https://phishunt.io/feed.json", headers={"User-Agent": "WaqayaThreatUpdater/3.0", "Accept": "application/json"})
+    with urlopen(req, timeout=35) as response:
+        raw = response.read(MAX_RESPONSE_BYTES + 1)
+    if len(raw) > MAX_RESPONSE_BYTES:
+        raise ValueError("Phishunt feed too large")
+    rows = json.loads(raw)
+    if not isinstance(rows, list):
+        raise ValueError("Invalid Phishunt schema")
+    urls = []
+    for row in rows:
+        if not isinstance(row, dict) or not any(row.get(k) is True for k in ("malicious_google", "malicious_openphish", "malicious_phishtank")):
+            continue
+        try:
+            checked = datetime.fromisoformat(row["date"].replace("Z", "+00:00"))
+            age = (datetime.now(timezone.utc) - checked).total_seconds()
+            if not 0 <= age <= 7 * 86400:
+                continue
+        except (KeyError, TypeError, ValueError):
+            continue
+        urls.extend(parse(str(row.get("url", "")).encode()))
+    urls = list(dict.fromkeys(urls))[:MAX_ITEMS_PER_SOURCE]
+    if not urls:
+        raise ValueError("No recent corroborated Phishunt records")
+    return urls
+
 
 def get_urlhaus():
     """Download URLhaus recent CSV; URLs are data only, never opened."""
@@ -110,15 +139,20 @@ def main():
             urls = previous_lists.get(source, [])
         if urls:
             merged.append({"source": source, "urls": urls})
-    try:
-        malware_urls = get_urlhaus()
-        merged.append({"source": "urlhaus", "urls": malware_urls})
-        successes += 1
-    except Exception as exc:
-        print(f"urlhaus: {type(exc).__name__}: {exc}")
-        failures.append("urlhaus")
-        if previous_lists.get("urlhaus"):
-            merged.append({"source": "urlhaus", "urls": previous_lists["urlhaus"]})
+    extra_sources = [("phishunt", get_phishunt)]
+    if URLHAUS_KEY:
+        extra_sources.append(("urlhaus", get_urlhaus))
+    for source, loader in extra_sources:
+        try:
+            urls = loader()
+            merged.append({"source": source, "urls": urls})
+            successes += 1
+        except Exception as exc:
+            # Never log exception URLs: an authenticated feed URL contains a secret.
+            print(f"{source}: unavailable ({type(exc).__name__})")
+            failures.append(source)
+            if previous_lists.get(source):
+                merged.append({"source": source, "urls": previous_lists[source]})
     if not successes:
         raise RuntimeError("No live source succeeded: refusing to rewrite snapshot")
     if not merged:
@@ -126,6 +160,8 @@ def main():
     now = datetime.now(timezone.utc)
     snapshot = {
         "schema": 1,
+        "disabled": [] if URLHAUS_KEY else ["urlhaus: requires URLHAUS_AUTH_KEY"],
+        "sourceInfo": {"openphish": {"homepage": "https://openphish.com/phishing_feeds.html", "cadence": "12 hours (community)"}, "phishdb": {"homepage": "https://github.com/Phishing-Database/Phishing.Database", "cadence": "upstream managed"}, "phishunt": {"homepage": "https://phishunt.io/feed/", "cadence": "hourly", "selection": "last 7 days, flagged by Google/OpenPhish/PhishTank according to Phishunt; not independently verified"}},
         "updatedAt": now.isoformat(timespec="seconds").replace("+00:00", "Z"),
         "at": int(now.timestamp() * 1000),
         "sources": [e["source"] for e in merged],
