@@ -1,0 +1,43 @@
+
+name: Refresh phishing data
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: threat-feed-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update phishing database
+        run: |
+          if [ -f site/scripts/update_threats.py ]; then
+            python3 site/scripts/update_threats.py
+          elif [ -f scripts/update_threats.py ]; then
+            python3 scripts/update_threats.py
+          else
+            echo "Threat updater script not found"
+            exit 1
+          fi
+
+      - name: Save updated database
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- ':(glob)**/data/threats.json'
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: update phishing database"
+            git push
+          fi
