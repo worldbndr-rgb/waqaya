@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>مركز الرصد التدريبي (SOC) | الوقاية من التصيّد الاحتيالي</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%232dd4bf'/%3E%3Cstop offset='1' stop-color='%233b82f6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M16 2 4 6.5v8.2c0 7.4 5.1 13.3 12 15.3 6.9-2 12-7.9 12-15.3V6.5z' fill='url(%23g)'/%3E%3Cpath d='m10.5 16.2 3.8 3.8 7.4-7.6' stroke='%23fff' stroke-width='2.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    body { padding: 22px; }
+    .dash { max-width: 1360px; margin: 0 auto; }
+    .dash-top { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--line-soft); border-radius: var(--r); padding: 18px 24px; margin-bottom: 24px; }
+    .dash-top h1 { font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; gap: 12px; }
+    .dash-top h1 i { color: var(--cyan); }
+    .dash-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 18px; margin-bottom: 24px; }
+    .m-card { background: var(--surface); border: 1px solid var(--line-soft); border-radius: var(--r); padding: 22px; border-inline-start: 4px solid var(--cyan); }
+    .m-card.rose { border-inline-start-color: var(--rose); }
+    .m-card.emerald { border-inline-start-color: var(--emerald); }
+    .m-card.amber { border-inline-start-color: var(--amber); }
+    .m-card .t { color: var(--muted); font-weight: 600; font-size: .95rem; margin-bottom: 8px; }
+    .m-card .v { font-size: 2.4rem; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+    .charts { display: grid; grid-template-columns: 1.7fr 1fr; gap: 18px; margin-bottom: 24px; }
+    .chart-card { background: var(--surface); border: 1px solid var(--line-soft); border-radius: var(--r); padding: 22px; height: 360px; }
+    .chart-card h3 { font-weight: 700; font-size: 1.05rem; margin-bottom: 12px; }
+    .chart-wrap { position: relative; height: 280px; }
+    .table-card { background: var(--surface); border: 1px solid var(--line-soft); border-radius: var(--r); padding: 22px; overflow-x: auto; }
+    .table-card h3 { font-weight: 800; font-size: 1.15rem; margin-bottom: 16px; }
+    table { width: 100%; border-collapse: collapse; text-align: right; min-width: 620px; }
+    th { color: var(--muted); font-weight: 700; padding: 12px; border-bottom: 2px solid var(--line); font-size: .9rem; }
+    td { padding: 14px 12px; border-bottom: 1px solid var(--line-soft); color: var(--text); font-size: .95rem; }
+    tr:hover td { background: var(--surface-2); }
+    .pill { background: var(--rose-weak); color: var(--rose); padding: 5px 11px; border-radius: 999px; font-size: .8rem; font-weight: 700; border: 1px solid color-mix(in srgb, var(--rose) 30%, transparent); }
+    .empty { text-align: center; color: var(--faint); padding: 40px; }
+    @media (max-width: 900px){ .charts { grid-template-columns: 1fr; } .chart-card { height: auto; } }
+    .src-badge { display: inline-flex; align-items: center; gap: 8px; font-size: .86rem; padding: 9px 14px; border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--line-soft); }
+    .src-badge.server { color: var(--emerald); background: var(--emerald-weak); border-color: color-mix(in srgb, var(--emerald) 35%, transparent); }
+    .src-badge.local { color: var(--muted); background: var(--surface-2); }
+    .src-badge b { color: inherit; }
+  </style>
+  <link rel="stylesheet" href="../css/enhancements.css">
+</head>
+<body>
+  <div class="dash">
+    <div class="dash-top">
+      <h1><i class="fas fa-satellite-dish pulse"></i> مركز الرصد التدريبي (SOC)</h1>
+      <div class="dash-actions">
+        <button class="icon-btn" data-theme-toggle aria-label="السمة"><i class="fas fa-sun" data-theme-icon></i></button>
+        <button class="btn btn-primary" id="btn-report"><i class="fas fa-file-lines"></i> تصدير تقرير (إثبات)</button>
+        <button class="btn btn-ghost" id="btn-export"><i class="fas fa-file-csv"></i> CSV</button>
+        <button class="btn btn-ghost" id="btn-json"><i class="fas fa-file-code"></i> JSON</button>
+        <button class="btn btn-danger" id="btn-purge"><i class="fas fa-trash"></i> إفراغ السجل</button>
+        <a class="btn btn-primary" href="../index.html"><i class="fas fa-house"></i> المنصّة</a>
+      </div>
+    </div>
+
+    <p style="color:var(--muted);font-size:.9rem;margin-bottom:12px">
+      <i class="fas fa-user-secret c-emerald"></i>
+      هذه اللوحة تعرض <b>أحداث تدريب مجهّلة</b> فقط (نوع المحاكاة، الوقت، المتصفح) — لا تحتوي على أي هوية أو بريد أو كلمة مرور.
+    </p>
+    <div id="data-source" class="src-badge">…</div>
+
+    <div class="metrics">
+      <div class="m-card amber"><div class="t">نسبة الوقوع (الصفحة الكاملة)</div><div class="v" id="v-rate">—</div></div>
+      <div class="m-card rose"><div class="t">تفاعلات المحاكاة</div><div class="v" id="v-total">0</div></div>
+      <div class="m-card emerald"><div class="t">نسبة النجاح في الاختبار</div><div class="v" id="v-pass">—</div></div>
+      <div class="m-card amber"><div class="t">متوسط طول كلمة المرور المُدخلة</div><div class="v" id="v-len">—</div></div>
+      <div class="m-card"><div class="t">رضا المشاركين (الاستبيان)</div><div class="v" id="v-sat">—</div></div>
+      <div class="m-card"><div class="t">آخر تفاعل</div><div class="v" id="v-last" style="font-size:1.3rem">—</div></div>
+    </div>
+
+    <div class="charts">
+      <div class="chart-card">
+        <h3>توزّع التفاعلات على أيام الأسبوع</h3>
+        <div class="chart-wrap"><canvas id="c-time"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>نواقل المحاكاة</h3>
+        <div class="chart-wrap"><canvas id="c-vector"></canvas></div>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <h3>سجل الأحداث (مجهّل)</h3>
+      <table>
+        <thead><tr><th>المعرّف</th><th>ناقل المحاكاة</th><th>طول الإدخال</th><th>المتصفح</th><th>الوقت</th><th>التصنيف</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="table-card" style="margin-top:24px">
+      <h3><i class="fas fa-chart-simple c-cyan"></i> ملخّص الاستبيان (مجهّل)</h3>
+      <div id="survey-summary" class="metrics" style="margin-bottom:0"></div>
+    </div>
+  </div>
+
+  <script src="../js/cloud-config.js"></script>
+  <script type="module">
+    import { Store } from '../js/storage.js';
+    const cloudDashboard = window.PP_CLOUD?.enabled && window.PP_CLOUD?.endpoint;
+    if (cloudDashboard && new URLSearchParams(location.search).get('local') !== '1') {
+      location.replace('cloud-dashboard.html');
+    }
+    const savedTheme = Store.getTheme(); if (savedTheme === 'light') document.body.classList.add('theme-light');
+    document.querySelector('[data-theme-toggle]').addEventListener('click', () => {
+      document.body.classList.toggle('theme-light');
+      const light = document.body.classList.contains('theme-light');
+      Store.setTheme(light ? 'light' : 'dark');
+      document.querySelector('[data-theme-icon]').className = light ? 'fas fa-moon' : 'fas fa-sun';
+      location.reload();
+    });
+
+    // مصدر البيانات: الخادم المحلي (كل الأجهزة) إن وُجد، وإلا هذا المتصفح وحده
+    const remote = cloudDashboard ? null : await Store.getRemoteAll();
+    const ON_SERVER = remote !== null;
+    const events = ON_SERVER ? remote.events : Store.getSimEvents();
+    const quiz   = ON_SERVER ? remote.quiz   : Store.getQuiz();
+    const survey = ON_SERVER ? remote.survey : Store.getSurvey();
+    const DAYS = ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+    const VLABEL = { 'fake-login-form':'نموذج مضمّن', 'fullscreen-fake-login':'صفحة كاملة', 'fake-domain':'نطاق مزيّف' };
+    const esc = (s) => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+    const MODE = ON_SERVER ? (remote._mode || 'local') : 'none';
+    const srcEl = document.getElementById('data-source');
+    if (MODE === 'cloud') {
+      srcEl.className = 'src-badge server';
+      srcEl.innerHTML = '<i class="fas fa-globe"></i> المصدر: السحابة — نتائج <b>كل الزوار عبر الإنترنت</b> من أي جهاز. تتحدّث تلقائياً.';
+    } else if (MODE === 'local') {
+      srcEl.className = 'src-badge server';
+      srcEl.innerHTML = '<i class="fas fa-network-wired"></i> المصدر: الخادم المحلي — نتائج <b>كل الأجهزة</b> على نفس الشبكة. تتحدّث تلقائياً.';
+    } else {
+      srcEl.className = 'src-badge local';
+      srcEl.innerHTML = '<i class="fas fa-laptop"></i> المصدر: هذا المتصفح وحده. التجميع المشترك غير مفعّل أو غير متاح لهذا الجهاز.';
+    }
+
+    // المقاييس
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    const ctr = ON_SERVER ? (remote.counters || {}) : Store.getCounters();
+    if (ctr.fl_views) set('v-rate', Math.round((ctr.fl_submits || 0) / ctr.fl_views * 100) + '%');
+    set('v-total', events.length);
+    if (quiz.length) {
+      const passed = quiz.filter(q => q.pct >= 75).length;
+      set('v-pass', Math.round((passed/quiz.length)*100) + '%');
+    }
+    if (events.length) {
+      const avg = Math.round(events.reduce((a,e)=>a+(e.inputLength||0),0)/events.length);
+      set('v-len', avg + ' محرف');
+      const last = events[events.length-1];
+      set('v-last', new Date(last.at).toLocaleDateString('ar-SA'));
+    }
+
+    // الاستبيان
+    if (survey.length) {
+      const avgSat = (survey.reduce((a,s)=>a+(s.usefulness||0),0)/survey.length);
+      set('v-sat', avgSat.toFixed(1) + ' / 5');
+
+      const FEAT = { inspector:'فاحص الروابط', password:'فاحص كلمة المرور', quiz:'الاختبار', checklist:'قائمة التحصين' };
+      const featCount = {};
+      survey.forEach(s => { if (s.feature) featCount[s.feature] = (featCount[s.feature]||0)+1; });
+      const topFeat = Object.entries(featCount).sort((a,b)=>b[1]-a[1])[0];
+      const avgAware = (survey.reduce((a,s)=>a+(s.awareness||0),0)/survey.length).toFixed(1);
+      const caught = survey.filter(s => s.targeted && s.targeted.startsWith('yes')).length;
+
+      document.getElementById('survey-summary').innerHTML = `
+        <div class="m-card emerald"><div class="t">عدد المشاركات</div><div class="v">${survey.length}</div></div>
+        <div class="m-card"><div class="t">متوسط الوعي (٥/)</div><div class="v">${avgAware}</div></div>
+        <div class="m-card amber"><div class="t">الأداة الأكثر فائدة</div><div class="v" style="font-size:1.15rem;margin-top:12px">${topFeat ? FEAT[topFeat[0]] : '—'}</div></div>
+        <div class="m-card rose"><div class="t">سبق تعرّضهم لتصيّد</div><div class="v">${caught}</div></div>`;
+    } else {
+      document.getElementById('survey-summary').innerHTML = '<div class="empty" style="grid-column:1/-1">لا توجد ردود استبيان بعد. شارك من صفحة الاستبيان.</div>';
+    }
+
+    // الجدول
+    const tb = document.getElementById('tbody');
+    if (!events.length) {
+      tb.innerHTML = '<tr><td colspan="6"><div class="empty">لا توجد أحداث مسجّلة بعد. جرّب المحاكاة من الصفحة الرئيسية.</div></td></tr>';
+    } else {
+      tb.innerHTML = [...events].reverse().map((e, i) => `
+        <tr>
+          <td style="color:var(--faint)">#EV-${(events.length-i).toString().padStart(4,'0')}</td>
+          <td class="mono" style="color:var(--cyan)">${esc(VLABEL[e.vector]||e.vector)}</td>
+          <td>${esc(e.inputLength||0)}</td>
+          <td>${esc(e.client||'—')}</td>
+          <td style="color:var(--muted);font-size:.9rem">${new Date(e.at).toLocaleString('ar-SA')}</td>
+          <td><span class="pill">تفاعل محاكاة</span></td>
+        </tr>`).join('');
+    }
+
+    // الرسوم
+    if (window.Chart) {
+      Chart.defaults.color = getComputedStyle(document.body).getPropertyValue('--muted');
+      Chart.defaults.font.family = "'Cairo', sans-serif";
+      const byDay = [0,0,0,0,0,0,0];
+      events.forEach(e => { const d = (e.day ?? new Date(e.at).getDay()); if (d>=0&&d<7) byDay[d]++; });
+      new Chart(document.getElementById('c-time'), {
+        type: 'line',
+        data: { labels: DAYS, datasets: [{ data: byDay, borderColor: '#38bdf8', backgroundColor: 'rgba(56,189,248,.15)', borderWidth: 3, fill: true, tension: .4, pointBackgroundColor: '#38bdf8', pointRadius: 4 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, grid: { color: 'rgba(148,164,195,.12)' } }, x: { grid: { display: false } } } }
+      });
+      const vecCount = {};
+      events.forEach(e => { const l = VLABEL[e.vector]||e.vector; vecCount[l] = (vecCount[l]||0)+1; });
+      const vLabels = Object.keys(vecCount).length ? Object.keys(vecCount) : ['لا بيانات'];
+      const vData = Object.values(vecCount).length ? Object.values(vecCount) : [1];
+      new Chart(document.getElementById('c-vector'), {
+        type: 'doughnut',
+        data: { labels: vLabels, datasets: [{ data: vData, backgroundColor: ['#38bdf8','#a78bfa','#fbbf24','#34d399'], borderWidth: 0, hoverOffset: 6 }] },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom' } } }
+      });
+    }
+
+    // ---------- التصدير: تسميات مقروءة ودوال مساعدة ----------
+    const FEAT_LBL = { inspector:'فاحص الروابط', password:'فاحص كلمة المرور', quiz:'الاختبار', checklist:'قائمة التحصين', '':'—' };
+    const TGT_LBL  = { 'yes-fell':'نعم، وتأثّر بها', 'yes-caught':'نعم، لكن انتبه لها', 'no':'لا يذكر', '':'—' };
+    const SRC_LBL  = MODE === 'cloud' ? 'السحابة (كل الزوار عبر الإنترنت)' : MODE === 'local' ? 'الخادم المحلي (كل الأجهزة على الشبكة)' : 'هذا المتصفح';
+    const fmtDate = (iso) => { try { return new Intl.DateTimeFormat('ar-SA-u-ca-gregory', { dateStyle:'medium', timeStyle:'short' }).format(new Date(iso)); } catch { return iso; } };
+    const dl = (name, mime, text) => {
+      const blob = new Blob(['﻿'+text], { type: mime + ';charset=utf-8;' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
+      setTimeout(() => { a.remove(); URL.revokeObjectURL(a.href); }, 1500);
+    };
+    const stamp = () => new Date().toISOString().slice(0,16).replace('T','_').replace(':','');
+
+    const passRate = quiz.length ? Math.round(quiz.filter(q => q.pct >= 75).length / quiz.length * 100) + '%' : '—';
+    const fallRate = (ctr.fl_views ? Math.round((ctr.fl_submits||0) / ctr.fl_views * 100) + '%' : '—');
+    const avgSatRep = survey.length ? (survey.reduce((a,s)=>a+(s.usefulness||0),0)/survey.length).toFixed(1) + ' / 5' : '—';
+
+    // ---------- تقرير HTML واضح للطباعة (إثبات) ----------
+    document.getElementById('btn-report').addEventListener('click', () => {
+      if (!events.length && !quiz.length && !survey.length) return alert('لا توجد بيانات بعد لإصدار تقرير.');
+      const now = new Intl.DateTimeFormat('ar-SA-u-ca-gregory', { dateStyle:'full', timeStyle:'short' }).format(new Date());
+      const simRows = [...events].reverse().map((e,i) => `<tr><td>${events.length-i}</td><td>${esc(VLABEL[e.vector]||e.vector)}</td><td>${e.inputLength||0}</td><td>${esc(e.client||'—')}</td><td>${esc(fmtDate(e.at))}</td></tr>`).join('') || `<tr><td colspan="5" class="empty">لا توجد أحداث محاكاة</td></tr>`;
+      const quizRows = [...quiz].reverse().map((q,i) => `<tr><td>${quiz.length-i}</td><td>${q.score} من ${q.total}</td><td>${q.pct}%</td><td>${q.pct>=75?'ناجح':'يحتاج مراجعة'}</td><td>${esc(fmtDate(q.at))}</td></tr>`).join('') || `<tr><td colspan="5" class="empty">لا توجد محاولات اختبار</td></tr>`;
+      const survRows = [...survey].reverse().map((s,i) => `<tr><td>${survey.length-i}</td><td>${s.awareness||'—'} من 5</td><td>${s.usefulness||'—'} من 5</td><td>${esc(TGT_LBL[s.targeted]||'—')}</td><td>${esc(FEAT_LBL[s.feature]||'—')}</td><td>${esc(fmtDate(s.at))}</td></tr>`).join('') || `<tr><td colspan="6" class="empty">لا توجد ردود استبيان</td></tr>`;
+      const html = `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>تقرير نتائج التدريب — الوقاية من التصيّد الاحتيالي</title>
+<style>
+  *{box-sizing:border-box} body{font-family:'Segoe UI','Tahoma',sans-serif;background:#f4f6fb;color:#13203b;margin:0;padding:32px;line-height:1.7}
+  .wrap{max-width:980px;margin:0 auto;background:#fff;border:1px solid #e2e8f3;border-radius:14px;padding:34px;box-shadow:0 10px 30px -18px rgba(0,0,0,.25)}
+  h1{font-size:1.5rem;margin:0 0 4px} .sub{color:#5b6b88;font-size:.92rem;margin-bottom:22px}
+  .meta{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:.88rem;color:#3a4a6b;border-top:1px solid #eef2f8;border-bottom:1px solid #eef2f8;padding:12px 0;margin-bottom:22px}
+  .meta b{color:#13203b}
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+  .card{background:#f7f9fd;border:1px solid #e7edf6;border-radius:10px;padding:14px}
+  .card .v{font-size:1.7rem;font-weight:800} .card .t{font-size:.8rem;color:#5b6b88}
+  .card.rose .v{color:#d12f54} .card.amber .v{color:#b7791f} .card.green .v{color:#0e8a63} .card.blue .v{color:#2160c4}
+  h2{font-size:1.1rem;margin:26px 0 10px;padding-bottom:6px;border-bottom:2px solid #eef2f8}
+  table{width:100%;border-collapse:collapse;font-size:.88rem} th,td{border:1px solid #e7edf6;padding:8px 10px;text-align:center}
+  th{background:#f0f4fb;color:#3a4a6b;font-weight:700} tr:nth-child(even) td{background:#fafcff}
+  .empty{color:#90a0bd;padding:16px}
+  .note{margin-top:26px;padding:14px 16px;background:#eafaf2;border:1px solid #bfe9d4;border-radius:10px;color:#0e6b4c;font-size:.86rem}
+  .foot{margin-top:18px;color:#8294b4;font-size:.78rem;text-align:center}
+  @media print{body{background:#fff;padding:0}.wrap{border:0;box-shadow:none}}
+</style></head><body><div class="wrap">
+  <h1>تقرير نتائج التدريب التوعوي</h1>
+  <div class="sub">منصّة «الوقاية من التصيّد الاحتيالي» — سجل إثبات للنتائج</div>
+  <div class="meta"><span>تاريخ الإصدار: <b>${esc(now)}</b></span><span>مصدر البيانات: <b>${esc(SRC_LBL)}</b></span><span>إجمالي السجلات: <b>${events.length + quiz.length + survey.length}</b></span></div>
+  <div class="cards">
+    <div class="card rose"><div class="v">${events.length}</div><div class="t">تفاعلات المحاكاة</div></div>
+    <div class="card amber"><div class="v">${fallRate}</div><div class="t">نسبة الوقوع (الصفحة الكاملة)</div></div>
+    <div class="card green"><div class="v">${passRate}</div><div class="t">نسبة النجاح في الاختبار</div></div>
+    <div class="card blue"><div class="v">${avgSatRep}</div><div class="t">متوسط رضا المشاركين</div></div>
+  </div>
+  <h2>١) سجل أحداث المحاكاة (${events.length})</h2>
+  <table><thead><tr><th>#</th><th>نوع المحاكاة</th><th>طول الإدخال</th><th>المتصفح</th><th>التاريخ والوقت</th></tr></thead><tbody>${simRows}</tbody></table>
+  <h2>٢) نتائج الاختبار (${quiz.length})</h2>
+  <table><thead><tr><th>#</th><th>الدرجة</th><th>النسبة</th><th>التقييم</th><th>التاريخ والوقت</th></tr></thead><tbody>${quizRows}</tbody></table>
+  <h2>٣) ردود الاستبيان (${survey.length})</h2>
+  <table><thead><tr><th>#</th><th>مستوى الوعي</th><th>تقييم الفائدة</th><th>سبق تعرّضه للتصيّد</th><th>الأداة الأفضل</th><th>التاريخ والوقت</th></tr></thead><tbody>${survRows}</tbody></table>
+  <div class="note"><b>إقرار الخصوصية:</b> جميع السجلات أعلاه مجهّلة تماماً — لا تحتوي على أي اسم أو رقم هوية أو بريد أو كلمة مرور. المنصّة تعليمية ولا تجمع بيانات اعتماد.</div>
+  <div class="foot">تم توليد هذا التقرير تلقائياً من لوحة الرصد — منصّة الوقاية من التصيّد الاحتيالي.</div>
+</div>
+<script>setTimeout(function(){try{window.print()}catch(e){}},400)<\/script>
+  <script src="../js/enhancements.js" defer></script>
+</body></html>`;
+      dl(`تقرير_نتائج_التدريب_${stamp()}.html`, 'text/html', html);
+    });
+
+    // ---------- CSV شامل وواضح (ثلاثة أقسام بعناوين عربية) ----------
+    document.getElementById('btn-export').addEventListener('click', () => {
+      if (!events.length && !quiz.length && !survey.length) return alert('لا توجد بيانات للتصدير.');
+      const q = (v) => {
+        const value = String(v==null?'':v);
+        return '"' + (/^[=+@\-\t\r\n]/.test(value) ? "'" : '') + value.replace(/"/g,'""') + '"';
+      };
+      const line = (arr) => arr.map(q).join(',');
+      let csv = line(['تقرير نتائج التدريب — الوقاية من التصيّد الاحتيالي']) + '\n';
+      csv += line(['المصدر', SRC_LBL, 'تاريخ الإصدار', fmtDate(new Date().toISOString())]) + '\n\n';
+      csv += line(['=== أحداث المحاكاة ===']) + '\n';
+      csv += line(['المعرف الفريد','معرف مشارك مجهّل','نوع المحاكاة','كلمة مرور أُدخلت؟','طول الإدخال','المصدر','المتصفح','التاريخ والوقت ISO','تم عرض التنبيه؟']) + '\n';
+      events.forEach((e,i) => { csv += line([e.id || i+1, 'مجهّل', VLABEL[e.vector]||e.vector, (e.passwordEntered ?? (e.inputLength > 0)) ? 'نعم':'لا', e.inputLength||0, e.vector||'—', e.client||'—', e.at||'', e.disclaimerShown === true ? 'نعم' : 'غير مسجل']) + '\n'; });
+      csv += '\n' + line(['=== نتائج الاختبار ===']) + '\n';
+      csv += line(['#','الدرجة','من','النسبة %','التاريخ والوقت']) + '\n';
+      quiz.forEach((e,i) => { csv += line([i+1, e.score, e.total, e.pct, fmtDate(e.at)]) + '\n'; });
+      csv += '\n' + line(['=== ردود الاستبيان ===']) + '\n';
+      csv += line(['#','مستوى الوعي /5','تقييم الفائدة /5','سبق تعرّضه للتصيّد','الأداة الأفضل','التاريخ والوقت']) + '\n';
+      survey.forEach((e,i) => { csv += line([i+1, e.awareness||'', e.usefulness||'', TGT_LBL[e.targeted]||'—', FEAT_LBL[e.feature]||'—', fmtDate(e.at)]) + '\n'; });
+      dl(`سجل_التدريب_${stamp()}.csv`, 'text/csv;charset=utf-8', '\uFEFF' + csv);
+    });
+
+    document.getElementById('btn-json').addEventListener('click', () => {
+      if (!events.length && !quiz.length && !survey.length) return alert('لا توجد بيانات للتصدير.');
+      const safeEvents = events.map((e, i) => ({
+        id: e.id || i+1, participant: 'مجهّل', source: e.vector || '',
+        passwordEntered: Boolean(e.passwordEntered ?? (e.inputLength > 0)),
+        inputLength: e.inputLength || 0, timestamp: e.at || '',
+        disclaimerShown: e.disclaimerShown === true ? true : null,
+        client: e.client || ''
+      }));
+      dl(`سجل_التدريب_${stamp()}.json`, 'application/json', JSON.stringify({events:safeEvents,quiz,survey},null,2));
+    });
+
+    document.getElementById('btn-purge').addEventListener('click', async () => {
+      if (MODE === 'cloud') {
+        alert('بيانات السحابة تُمسح من لوحة Supabase: افتح Table Editor → جدول events → احذف الصفوف (أو Truncate). الزوار لا يملكون صلاحية الحذف—وهذا مقصود لحماية البيانات.');
+        return;
+      }
+      const msg = MODE === 'local'
+        ? 'سيتم مسح نتائج كل الأجهزة من الخادم المحلي نهائياً. متابعة؟'
+        : 'سيتم مسح كل أحداث التدريب من هذا المتصفح نهائياً. متابعة؟';
+      if (!confirm(msg)) return;
+      if (MODE === 'local') {
+        if (!await Store.resetRemote()) {
+          alert('تعذّر المسح. المسح من جهاز العرض نفسه فقط؛ لم تتغير البيانات.');
+          return;
+        }
+      } else Store.clearSimEvents();
+      location.reload();
+    });
+
+    // تحديث تلقائي أثناء العرض عندما تأتي البيانات من مصدر مشترك
+    if (ON_SERVER) setInterval(() => location.reload(), 20000);
+  </script>
+</body>
+</html>

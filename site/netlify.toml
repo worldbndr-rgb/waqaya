@@ -1,0 +1,9 @@
+# Netlify deploys the site whenever GitHub receives an updated threat snapshot.
+[build]
+  publish = "."
+
+[[headers]]
+  for = "/data/threats.json"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+    X-Content-Type-Options = "nosniff"

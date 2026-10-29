@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="قائمة مباشرة بأحدث مواقع التصيّد الاحتيالي المكتشفة حول العالم، تُحدَّث تلقائياً من مصادر استخبارات تهديدات مفتوحة.">
+  <title>المواقع المشبوهة الآن | الوقاية من التصيّد الاحتيالي</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%232dd4bf'/%3E%3Cstop offset='1' stop-color='%233b82f6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M16 2 4 6.5v8.2c0 7.4 5.1 13.3 12 15.3 6.9-2 12-7.9 12-15.3V6.5z' fill='url(%23g)'/%3E%3Cpath d='m10.5 16.2 3.8 3.8 7.4-7.6' stroke='%23fff' stroke-width='2.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/enhancements.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">تخطَّ إلى المحتوى</a>
+  <nav class="nav" aria-label="التنقل الرئيسي">
+    <div class="container">
+      <a href="../index.html" class="brand" aria-label="الوقاية من التصيّد الاحتيالي — الرئيسية">
+        <span class="glyph"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3 5 7.2v7.6c0 6.9 4.7 12.4 11 14.2 6.3-1.8 11-7.3 11-14.2V7.2z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="m11 16 3.6 3.6 6.6-6.8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="brand-txt">الوقاية من التصيّد الاحتيالي</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="educational.html"><span class="n">١</span> اعرف</a></li>
+        <li><a href="../index.html#check"><span class="n">٢</span> افحص</a></li>
+        <li><a href="../index.html#train"><span class="n">٣</span> تدرّب</a></li>
+        <li><a href="protection.html"><span class="n">٤</span> تحصّن</a></li>
+        <li><a href="../index.html#report"><span class="n">٥</span> بلّغ</a></li>
+        <li><a href="threat-feed.html" class="cta active" aria-current="page"><span class="live-dot"></span> المواقع المشبوهة الآن</a></li>
+      </ul>
+      <div class="nav-tools">
+        <button class="icon-btn" data-theme-toggle aria-label="تبديل السمة"><i class="fas fa-sun" data-theme-icon></i></button>
+        <button class="icon-btn nav-toggle" aria-label="القائمة" aria-expanded="false"><i class="fas fa-bars"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="section" id="main" style="padding-top:calc(var(--nav-h) + 50px)">
+    <div class="container">
+      <div class="section-head">
+        <span class="kicker"><i class="fas fa-tower-broadcast"></i> استخبارات تهديدات مباشرة</span>
+        <h2>المواقع المشبوهة الآن</h2>
+        <p>أحدث روابط التصيّد المكتشفة حول العالم، تُجلب مباشرة من قوائم يحدّثها باحثو الأمن السيبراني وتتجدّد تلقائياً كل ١٠ دقائق.</p>
+      </div>
+
+      <div class="sim-warn" style="max-width:none;margin-bottom:22px">
+        <i class="fas fa-triangle-exclamation"></i>
+        <div>
+          <b>لا تفتح أيّاً من هذه الروابط</b>
+          <p>عُرضت الروابط بصيغة «معطّلة» (<code dir="ltr">hxxps://site[.]com</code>) حتى لا تُفتح بالخطأ—وهي الطريقة المعتمدة لتداول مؤشرات التهديد بين المختصين.</p>
+        </div>
+      </div>
+
+      <div class="feed-bar">
+        <div class="feed-status loading" id="feed-status" aria-live="polite"><i class="fas fa-satellite-dish"></i> جارٍ الاتصال…</div>
+        <div class="feed-bar-end">
+          <span class="feed-next" id="feed-next"></span>
+          <button class="btn btn-ghost" id="feed-refresh" type="button"><i class="fas fa-rotate"></i> تحديث</button>
+        </div>
+      </div>
+
+      <div class="metrics feed-metrics">
+        <div class="m-card rose"><div class="t">روابط تصيّد نشطة</div><div class="v" id="st-total">—</div></div>
+        <div class="m-card"><div class="t">نطاقات مختلفة</div><div class="v" id="st-domains">—</div></div>
+        <div class="m-card amber"><div class="t">تستهدف جهات سعودية</div><div class="v" id="st-sa">—</div></div>
+        <div class="m-card emerald"><div class="t">تستخدم HTTPS (قفل)</div><div class="v" id="st-https">—</div></div>
+      </div>
+      <p class="feed-insight"><i class="fas fa-lightbulb"></i> لاحظ نسبة الروابط التي تستخدم HTTPS: <b>القفل لا يعني أن الموقع آمن</b>—المحتالون يحصلون على الشهادات مجاناً.</p>
+
+      <div class="feed-panels">
+        <div class="table-card"><h3><i class="fas fa-bullseye c-rose"></i> أكثر الجهات انتحالاً</h3><div id="top-brands"></div></div>
+        <div class="table-card"><h3><i class="fas fa-globe c-cyan"></i> أكثر امتدادات النطاقات</h3><div id="top-tlds"></div></div>
+        <div class="table-card"><h3><i class="fas fa-server c-amber"></i> استضافات مجانية مُساء استخدامها</h3><div id="top-hosting"></div></div>
+      </div>
+
+      <div class="table-card lookup-card">
+        <h3><i class="fas fa-magnifying-glass c-cyan"></i> هل هذا الرابط في القائمة؟</h3>
+        <form id="lookup-form" class="field">
+          <input id="lookup-input" type="text" placeholder="الصق رابطاً أو نطاقاً" autocomplete="off" spellcheck="false" dir="ltr">
+          <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i> تحقّق</button>
+        </form>
+        <div id="lookup-out" class="lookup-out" aria-live="polite"></div>
+      </div>
+
+      <div class="table-card">
+        <div class="feed-filters">
+          <input id="feed-q" type="search" placeholder="ابحث: paypal، absher، .xyz …" dir="auto" aria-label="بحث في القائمة">
+          <select id="feed-src" aria-label="المصدر">
+            <option value="all">كل المصادر</option>
+            <option value="openphish">OpenPhish</option>
+            <option value="phishdb">Phishing.Database</option>
+          </select>
+          <label class="chk"><input type="checkbox" id="feed-sa"> تستهدف السعودية</label>
+          <label class="chk"><input type="checkbox" id="feed-new"> الجديد فقط</label>
+          <span class="feed-count" id="feed-count"></span>
+        </div>
+        <div id="feed-list" class="feed-list"><div class="empty">جارٍ التحميل…</div></div>
+        <div style="text-align:center;margin-top:14px"><button class="btn btn-ghost" id="feed-more" type="button" hidden><i class="fas fa-angles-down"></i> عرض المزيد</button></div>
+      </div>
+
+      <div class="table-card feed-sources">
+        <h3><i class="fas fa-database c-violet"></i> مصادر البيانات</h3>
+        <ul>
+          <li><b>OpenPhish Community Feed</b> — <span id="src-openphish">—</span> رابط · تُحدَّث كل ١٢ ساعة · للاستخدام غير التجاري. <span class="mono" dir="ltr">openphish.com</span></li>
+          <li><b>Phishing.Database</b> — <span id="src-phishdb">—</span> رابط · روابط جديدة مكتشفة اليوم، مفحوصة آلياً بأداة PyFunceble · رخصة MIT. <span class="mono" dir="ltr">github.com/Phishing-Database</span></li>
+        </ul>
+        <p>تُجلب البيانات مباشرة من متصفحك إلى هذه المصادر؛ لا يمرّ شيء عبر خادم خاص بنا. تحديد «الجهة المستهدفة» تقديري بناءً على الكلمات الظاهرة في الرابط. لإبلاغ عن موقع احتيالي في السعودية: أعد توجيه الرسالة إلى <b>330330</b> أو بلّغ عبر «كلنا أمن».</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="f-about">
+        <a href="../index.html" class="brand"><span class="glyph"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3 5 7.2v7.6c0 6.9 4.7 12.4 11 14.2 6.3-1.8 11-7.3 11-14.2V7.2z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="m11 16 3.6 3.6 6.6-6.8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="brand-txt">الوقاية من التصيّد الاحتيالي</span></a>
+        <p>منصّة توعوية عملية ضد التصيّد الاحتيالي. الهدف تعليمي بحت—نُظهر أساليب المهاجمين لتتعلّم كيف تتجنّبها.</p>
+      </div>
+      <div>
+        <h5>رحلة الوقاية</h5>
+        <ul>
+          <li><a href="educational.html">١ · اعرف: أنواع التصيّد</a></li>
+          <li><a href="../index.html#check">٢ · افحص: أدوات الفحص</a></li>
+          <li><a href="../index.html#train">٣ · تدرّب: الاختبار والمحاكاة</a></li>
+          <li><a href="protection.html">٤ · تحصّن: قائمة الحماية</a></li>
+          <li><a href="../index.html#report">٥ · بلّغ: قنوات الإبلاغ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>أدوات</h5>
+        <ul>
+          <li><a href="../index.html#inspector">فاحص الروابط</a></li>
+          <li><a href="../index.html#check">فاحص الرسائل وكلمات المرور</a></li>
+          <li><a href="threat-feed.html">المواقع المشبوهة الآن</a></li>
+          <li><a href="fake-login.html">المحاكاة الكاملة</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>عن المشروع</h5>
+        <ul>
+          <li><a href="survey.html">شاركنا رأيك (استبيان)</a></li>
+          <li><a href="admin-view.html">لوحة الرصد التدريبية</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="container footer-bottom">© 2026 الوقاية من التصيّد الاحتيالي — مشروع تخرّج توعوي. لا يجمع بيانات ولا يخزّن كلمات مرور.</div>
+  </footer>
+  <button class="to-top" aria-label="أعلى الصفحة"><i class="fas fa-arrow-up"></i></button>
+  <script src="../js/cloud-config.js"></script>
+  <script type="module" src="../js/app.js"></script>
+  <script type="module" src="../js/feed-page.js"></script>
+  <script src="../js/enhancements.js" defer></script>
+</body>
+</html>

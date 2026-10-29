@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>محاكاة التصيّد الإلكتروني | الوقاية من التصيّد الاحتيالي</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Cairo',sans-serif;background:#f0f4f8;min-height:100vh}
+    #edu-banner{
+      position:fixed;top:0;left:0;right:0;z-index:9999;
+      background:linear-gradient(90deg,#15803d,#16a34a);
+      color:#fff;text-align:center;padding:11px 14px;
+      font-size:.95rem;font-weight:700;box-shadow:0 3px 12px rgba(0,0,0,.25);
+      display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;
+    }
+    #edu-banner .tag{background:rgba(255,255,255,.22);padding:2px 14px;border-radius:20px;font-size:.88rem}
+    #portal-page{padding-top:50px;min-height:100vh;display:flex;flex-direction:column}
+    .ph{background:linear-gradient(135deg,#102344,#1e3a6e);color:#fff;padding:18px 30px;display:flex;align-items:center;gap:18px}
+    .ph-logo{width:58px;height:58px;border-radius:12px;flex-shrink:0;background:rgba(255,255,255,.1);border:2px solid rgba(212,160,23,.65);display:flex;align-items:center;justify-content:center;font-size:1.85rem;cursor:pointer;user-select:none;transition:transform .15s}
+    .ph-logo:active{transform:scale(.9)}
+    .ph-titles h1{font-size:1.28rem;font-weight:800}
+    .ph-titles p{font-size:.78rem;opacity:.7;margin-top:2px}
+    .ph-badge{margin-right:auto;background:#d4a017;color:#111;padding:5px 14px;border-radius:6px;font-size:.75rem;font-weight:800}
+    .pnav{background:#102344;color:rgba(255,255,255,.58);padding:9px 30px;display:flex;gap:24px;font-size:.86rem}
+    .pnav span{cursor:pointer;transition:color .2s}.pnav span:hover{color:#d4a017}
+    .pb{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 18px}
+    .lcard{background:#fff;border-radius:18px;width:100%;max-width:430px;box-shadow:0 12px 50px rgba(0,0,0,.13);overflow:hidden;border-top:4px solid #1e3a6e}
+    .lhead{text-align:center;padding:34px 30px 16px}
+    .lhead .ic{width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#1e3a6e,#2255a4);color:#d4a017;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:1.8rem}
+    .lhead h2{font-size:1.3rem;color:#1e3a6e;font-weight:800}
+    .lhead p{color:#64748b;font-size:.86rem;margin-top:4px}
+    .lbody{padding:8px 30px 30px}
+    .fld{margin-bottom:18px}
+    .fld label{display:block;font-weight:700;color:#1a1a2e;margin-bottom:8px;font-size:.9rem}
+    .fld input{width:100%;padding:13px 15px;border:1.5px solid #e2e8f0;border-radius:10px;font-family:inherit;font-size:1rem;color:#1a1a2e;direction:ltr;text-align:right;outline:none;transition:border-color .2s,box-shadow .2s}
+    .fld input:focus{border-color:#1e3a6e;box-shadow:0 0 0 4px rgba(30,58,110,.1)}
+    .fld .hint{font-size:.76rem;color:#94a3b8;margin-top:5px}
+    .go{width:100%;padding:14px;background:linear-gradient(135deg,#1e3a6e,#2255a4);color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:1.05rem;font-weight:700;cursor:pointer;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
+    .go:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(30,58,110,.4)}
+    .trust{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:20px;padding-top:20px;border-top:1px solid #e2e8f0}
+    .ti{display:flex;align-items:center;gap:6px;font-size:.76rem;color:#64748b}
+    .ti i{color:#16a34a}
+    .pfooter{background:#102344;color:rgba(255,255,255,.38);text-align:center;padding:13px;font-size:.78rem}
+    #reveal{display:none;position:fixed;inset:0;z-index:8888;background:linear-gradient(160deg,#991b1b,#7f1d1d);overflow-y:auto;padding-top:50px}
+    #reveal.on{display:block;animation:fadeIn .55s ease}
+    @keyframes fadeIn{from{opacity:0;transform:scale(1.02)}to{opacity:1;transform:scale(1)}}
+    .rvw{max-width:720px;margin:0 auto;padding:58px 22px 50px;color:#fff}
+    .rvi{text-align:center;font-size:5rem;margin-bottom:16px;animation:shk .55s ease .15s both}
+    @keyframes shk{0%,100%{transform:rotate(0)}25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
+    .rvh{text-align:center;font-size:2rem;font-weight:900;margin-bottom:10px}
+    .rvs{text-align:center;font-size:1rem;opacity:.9;line-height:1.8;margin-bottom:38px}
+    .rvs b{background:rgba(255,255,255,.18);padding:0 8px;border-radius:6px}
+    .rvbox{background:rgba(0,0,0,.25);border-radius:14px;padding:24px;border:1px solid rgba(255,255,255,.15);margin-bottom:20px}
+    .rvbox h3{font-size:1.06rem;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+    .rvlist{list-style:none}
+    .rvlist li{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.1);font-size:.94rem;line-height:1.65}
+    .rvlist li:last-child{border-bottom:none}
+    .blt{flex-shrink:0;margin-top:3px}
+    .rvtips{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:28px}
+    .rvtip{background:rgba(255,255,255,.12);border-radius:12px;padding:16px 12px;text-align:center;border:1px solid rgba(255,255,255,.2)}
+    .rvtip .ico{font-size:1.9rem;margin-bottom:8px;display:block}
+    .rvtip p{font-size:.8rem;font-weight:700}
+    .rvact{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:28px}
+    .rvbtn{padding:13px 24px;border-radius:10px;font-family:inherit;font-size:.96rem;font-weight:700;cursor:pointer;border:none;display:flex;align-items:center;gap:8px;transition:all .2s}
+    .rvbtn.w{background:#fff;color:#991b1b}
+    .rvbtn.o{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.4)}
+    .rvbtn:hover{transform:translateY(-2px)}
+    #admin-panel{display:none;position:fixed;bottom:22px;left:22px;right:22px;max-width:400px;margin:0 auto;z-index:9998;background:#0d1b3e;color:#fff;border-radius:16px;padding:22px;border:1px solid rgba(255,255,255,.12);box-shadow:0 8px 40px rgba(0,0,0,.5)}
+    #admin-panel.open{display:block;animation:rise .3s ease}
+    @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    #admin-panel h3{font-size:.95rem;color:#d4a017;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+    .x-btn{float:left;background:none;border:none;color:rgba(255,255,255,.4);font-size:1.2rem;cursor:pointer}
+    .sr{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:.9rem}
+    .sr:last-of-type{border-bottom:none}
+    .sv{font-size:1.8rem;font-weight:900;color:#38bdf8}
+    .sv.red{color:#f87171}
+    #adm-note{font-size:.7rem;color:rgba(255,255,255,.3);margin-top:10px;text-align:center;line-height:1.6}
+    #tap-hint{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);z-index:9997;background:rgba(0,0,0,.75);color:#fff;padding:6px 18px;border-radius:20px;font-size:.78rem;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+    #tap-hint.show{opacity:1}
+    @media(max-width:480px){.ph{padding:12px 14px}.pnav{padding:8px 14px;gap:14px;font-size:.8rem}.lhead,.lbody{padding-inline:20px}.rvh{font-size:1.55rem}.rvtips{grid-template-columns:1fr 1fr}}
+  </style>
+  <link rel="stylesheet" href="../css/enhancements.css">
+</head>
+<body>
+
+  <div id="edu-banner">
+    🎓 <span class="tag">منصة تدريبية توعوية</span>
+    &nbsp;|&nbsp; هذه صفحة <strong>محاكاة فقط</strong> — لا تُدخل بياناتك الحقيقية أبداً
+  </div>
+
+  <div id="portal-page">
+    <div class="ph">
+      <div class="ph-logo" id="logo-tap">🛡️</div>
+      <div class="ph-titles">
+        <h1>بوابة «وَصْل» للخدمات الإلكترونية</h1>
+        <p>Wasl e-Services · جهة وهمية لأغراض التدريب</p>
+      </div>
+      <span class="ph-badge">🔒 موقع آمن</span>
+    </div>
+    <nav class="pnav">
+      <span>الرئيسية</span><span>الخدمات الإلكترونية</span><span>تواصل معنا</span><span>الأسئلة الشائعة</span>
+    </nav>
+    <div class="pb">
+      <div class="lcard">
+        <div class="lhead">
+          <div class="ic"><i class="fas fa-user-lock"></i></div>
+          <h2>تسجيل الدخول</h2>
+          <p>للوصول إلى خدماتك الإلكترونية</p>
+        </div>
+        <div class="lbody">
+          <form id="fake-form">
+            <div class="fld">
+              <label for="inp-id">رقم الهوية الوطنية / الإقامة</label>
+              <input type="text" id="inp-id" placeholder="10 أرقام" maxlength="10" autocomplete="off">
+              <div class="hint">مثال: 1XXXXXXXXX</div>
+            </div>
+            <div class="fld">
+              <label for="inp-pw">كلمة المرور</label>
+              <input type="password" id="inp-pw" placeholder="••••••••" autocomplete="new-password">
+            </div>
+            <button type="submit" class="go"><i class="fas fa-sign-in-alt"></i> دخول</button>
+          </form>
+          <div class="trust">
+            <div class="ti"><i class="fas fa-lock"></i> اتصال مشفّر</div>
+            <div class="ti"><i class="fas fa-shield-halved"></i> بياناتك محمية</div>
+            <div class="ti"><i class="fas fa-certificate"></i> موقع رسمي</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pfooter">© 2026 «وَصْل» — جهة وهمية ضمن مشروع الوقاية من التصيّد الاحتيالي التوعوي</div>
+  </div>
+
+  <div id="reveal" tabindex="-1" role="alert">
+    <div class="rvw">
+      <div class="rvi">🪤</div>
+      <h1 class="rvh">⚠️ وقعت في فخ التصيّد الإلكتروني!</h1>
+      <p class="rvs">لو كانت هذه صفحة حقيقية، كانت بياناتك الآن في يد المخترقين.<br>لكن لا تقلق — هذه <b>بيئة تدريبية آمنة بالكامل</b>، ولم نحفظ شيئاً حقيقياً.</p>
+      <div class="rvbox">
+        <h3>🔍 علامات التصيّد التي كان يجب أن تلاحظها</h3>
+        <ul class="rvlist">
+          <li><span class="blt">🔗</span><div><strong>عنوان الرابط مزيّف:</strong> الموقع الحكومي الرسمي ينتهي بـ <code>.gov.sa</code> فقط — أي نطاق آخر مشبوه مهما بدا رسمياً.</div></li>
+          <li><span class="blt">📲</span><div><strong>وصل الرابط برسالة:</strong> الجهات الرسمية لا ترسل روابط تسجيل دخول عبر واتساب أو رسائل SMS.</div></li>
+          <li><span class="blt">⏰</span><div><strong>إحساس بالإلحاح:</strong> عبارات مثل "عاجل" أو "سيُغلق حسابك" ضغط نفسي لمنعك من التفكير.</div></li>
+          <li><span class="blt">🛡️</span><div><strong>أيقونات الأمان زائفة:</strong> "اتصال مشفّر" و"موقع رسمي" يكتبها أي موقع — تحقّق دائماً من الرابط نفسه.</div></li>
+        </ul>
+      </div>
+      <div class="rvtips">
+        <div class="rvtip"><span class="ico">🔗</span><p>تحقّق من الرابط قبل أي إدخال</p></div>
+        <div class="rvtip"><span class="ico">🔐</span><p>فعّل المصادقة الثنائية 2FA</p></div>
+        <div class="rvtip"><span class="ico">📵</span><p>لا تُشارك رمز OTP مع أحد</p></div>
+        <div class="rvtip"><span class="ico">📞</span><p>أبلغ عن التصيّد: 330330</p></div>
+      </div>
+      <div class="rvact">
+        <button class="rvbtn w" id="btn-again"><i class="fas fa-rotate-right"></i> اختبر شخصاً آخر</button>
+        <a class="rvbtn o" href="../index.html" style="text-decoration:none"><i class="fas fa-house"></i> العودة للمنصّة</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="admin-panel">
+    <button class="x-btn" id="close-adm">✕</button>
+    <h3><i class="fas fa-satellite-dish"></i> نتائج التدريب — مباشر</h3>
+    <div id="adm-body"><div style="opacity:.5;font-size:.88rem;padding:6px 0">⏳ جارٍ التحميل…</div></div>
+    <div id="adm-note">✅ لا يُحفظ أي اسم أو كلمة مرور — الأرقام من هذا الجهاز فقط، والتفاصيل في لوحة الرصد</div>
+  </div>
+  <div id="tap-hint"></div>
+
+  <script src="../js/cloud-config.js"></script>
+  <script type="module">
+    /* ─────────────────────────────────────────────────────────
+       كل شيء يُحفظ محلياً عبر storage.js (بدون أي خادم).
+       ملاحظة: الإصدار السابق اعتمد على api.countapi.xyz
+       وهي خدمة متوقفة، فكانت العدادات لا تعمل إطلاقاً.
+       لا تُحفظ الهوية ولا كلمة المرور — فقط طول الإدخال.
+       ───────────────────────────────────────────────────────── */
+    import { Store } from '../js/storage.js';
+
+    Store.bump('fl_views');
+
+    const $ = (id) => document.getElementById(id);
+
+    $('fake-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const id = $('inp-id').value.trim();
+      const pw = $('inp-pw').value;
+      if (!id && !pw) return;
+      Store.bump('fl_submits');
+      Store.logSimEvent({ vector: 'fullscreen-fake-login', inputLength: pw.length });
+      $('fake-form').reset();                         // نمسح القيم من الذاكرة فوراً
+      $('portal-page').style.display = 'none';
+      $('reveal').classList.add('on');
+      window.scrollTo(0, 0);
+      $('reveal').focus();
+    });
+
+    $('btn-again').addEventListener('click', () => {
+      $('reveal').classList.remove('on');
+      $('portal-page').style.display = '';
+      window.scrollTo(0, 0);
+    });
+
+    /* لوحة المشرف: اضغط الشعار 5 مرات */
+    let taps = 0, timer = null;
+    const hint = $('tap-hint');
+    $('logo-tap').addEventListener('click', () => {
+      taps++;
+      clearTimeout(timer);
+      const rem = 5 - taps;
+      if (rem > 0) {
+        hint.textContent = 'اضغط ' + rem + ' مرات أخرى…';
+        hint.classList.add('show');
+        setTimeout(() => hint.classList.remove('show'), 1200);
+        timer = setTimeout(() => { taps = 0; }, 3000);
+      } else {
+        taps = 0; hint.classList.remove('show');
+        openAdmin();
+      }
+    });
+
+    function openAdmin() {
+      const c = Store.getCounters();
+      const v = c.fl_views || 0, s = c.fl_submits || 0;
+      const rate = v > 0 ? Math.round(s / v * 100) + '%' : '—';
+      $('adm-body').innerHTML =
+        '<div class="sr"><span>مرات فتح الصفحة</span><div class="sv">' + v + '</div></div>' +
+        '<div class="sr"><span>مرات إدخال بيانات</span><div class="sv red">' + s + '</div></div>' +
+        '<div class="sr"><span>نسبة الوقوع</span><div class="sv">' + rate + '</div></div>';
+      $('admin-panel').classList.add('open');
+    }
+
+    $('close-adm').addEventListener('click', () => $('admin-panel').classList.remove('open'));
+  </script>
+  <script src="../js/enhancements.js" defer></script>
+</body>
+</html>

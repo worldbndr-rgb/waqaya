@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>لوحة الرصد المجمّعة — وقاية</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    main{padding:36px 0}.dash-head{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:24px}
+    .dash-actions{display:flex;gap:10px;flex-wrap:wrap}.summary-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin:24px 0}
+    .summary-metrics .card{padding:22px}.summary-metrics dt{color:var(--muted);font-size:.9rem}.summary-metrics dd{font-size:1.9rem;color:var(--cyan);font-weight:800;margin:12px 0 0}
+    .summary-charts{display:grid;grid-template-columns:1fr 1fr;gap:20px}.summary-charts .card{padding:24px}.summary-row{display:grid;grid-template-columns:130px 1fr 40px;gap:10px;align-items:center;margin:16px 0}.summary-row progress{width:100%;accent-color:var(--cyan)}
+    #summary-status{color:var(--muted);margin:16px 0}.summary-note{padding:18px;border:1px solid var(--line);border-radius:12px;color:var(--muted);line-height:1.9}
+    @media(max-width:650px){.summary-charts{grid-template-columns:1fr}.summary-metrics{grid-template-columns:1fr 1fr;gap:10px}.summary-metrics .card{padding:14px}.summary-metrics dd{font-size:1.4rem}.summary-row{grid-template-columns:100px 1fr 32px;gap:6px}}
+  </style>
+  <link rel="stylesheet" href="../css/enhancements.css">
+</head>
+<body>
+  <main class="container">
+    <div class="dash-head">
+      <div><a href="../index.html" class="brand">وقاية</a><h1>لوحة الرصد المجمّعة</h1></div>
+      <div class="dash-actions">
+        <button class="btn btn-ghost" id="summary-theme" aria-label="تبديل السمة">السمة</button>
+        <button class="btn btn-primary" id="summary-refresh">تحديث</button>
+        <button class="btn btn-ghost" id="summary-csv" disabled>تصدير CSV</button>
+        <button class="btn btn-ghost" id="summary-json" disabled>تصدير JSON</button>
+        <a class="btn btn-ghost" href="admin-view.html?local=1">سجل هذا المتصفح</a>
+        <a class="btn btn-primary" href="../index.html">المنصّة</a>
+      </div>
+    </div>
+    <p class="summary-note">إحصاءات التدريب خلال آخر 30 يوماً من جميع الأجهزة. لا تعرض هذه الصفحة سجلات فردية أو هويات أو كلمات مرور. قد تتأخر الأرقام نصف دقيقة، وهي مؤشرات تدريبية وليست قياساً علمياً لعينة موثقة.</p>
+    <p id="summary-status" role="status" aria-live="polite">جارٍ الاتصال بالسحابة…</p>
+    <dl class="summary-metrics" id="summary-metrics"></dl>
+    <div class="summary-charts">
+      <section class="card"><h2>التفاعلات حسب اليوم (UTC)</h2><div id="summary-days"></div></section>
+      <section class="card"><h2>أنواع المحاكاة</h2><div id="summary-vectors"></div></section>
+      <section class="card"><h2>نتائج الاستبيان</h2><div id="summary-survey"></div></section>
+      <section class="card"><h2>الأدوات المفضّلة</h2><div id="summary-features"></div></section>
+    </div>
+  </main>
+  <script src="../js/cloud-config.js"></script>
+  <script type="module" src="../js/cloud-dashboard.js"></script>
+  <script src="../js/enhancements.js" defer></script>
+</body>
+</html>

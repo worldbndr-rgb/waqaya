@@ -1,0 +1,59 @@
+
+/* WaQaya UX refresh — additive, compatible with existing layouts */
+:root { color-scheme: dark; --focus-outline: #67e8f9; }
+body.theme-light { color-scheme: light; }
+html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+body { -webkit-tap-highlight-color: transparent; }
+:where(a,button,input,textarea,select,[role="button"]):focus-visible {
+ outline: 3px solid var(--focus-outline) !important; outline-offset: 3px;
+}
+:where(button,.btn,a) { touch-action: manipulation; }
+:where(input,textarea,select) { max-width: 100%; font-size: max(16px,1em); }
+:where(img,svg,video,canvas) { max-width: 100%; }
+:where(p,h1,h2,h3,h4) { overflow-wrap: anywhere; }
+::selection { background: rgba(45,212,191,.32); color: inherit; }
+.ux-progress { position:fixed; z-index:9998; top:0; right:0; width:0; height:3px;
+ background:linear-gradient(90deg,#2dd4bf,#60a5fa); pointer-events:none; transition:width .1s linear; }
+.ux-top { position:fixed; z-index:9997; bottom:22px; left:20px; width:48px; height:48px;
+ border:1px solid rgba(125,211,252,.35); border-radius:16px; background:#15304a; color:#f0fdfa;
+ box-shadow:0 10px 30px #0005; cursor:pointer; opacity:0; transform:translateY(12px);
+ pointer-events:none; transition:opacity .2s,transform .2s; font-size:22px; }
+.ux-top.visible { opacity:1; transform:translateY(0); pointer-events:auto; }
+.ux-offline { position:fixed; z-index:10000; left:50%; bottom:18px; transform:translateX(-50%);
+ max-width:calc(100vw - 24px); padding:12px 18px; border-radius:12px; background:#78350f;
+ color:#fff; box-shadow:0 12px 30px #0006; text-align:center; font:700 14px Cairo,sans-serif; }
+.ux-offline[hidden] { display:none!important; }
+@media (max-width:640px) {
+ .ux-top { bottom:14px; left:12px; width:44px; height:44px; border-radius:12px; }
+ :where(.container) { max-width:100%; }
+}
+@media (prefers-reduced-motion:reduce) {
+ html { scroll-behavior:auto; }
+ *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important; }
+}
+@media print {
+ .ux-progress,.ux-top,.ux-offline,.nav-toggle,.toast-host { display:none!important; }
+ body { background:#fff!important; color:#111!important; }
+}
+
+/* Visual polish across all original pages */
+:where(.card,.feature-card,.tool-card,.stat-card,.quiz-card) {
+ transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+}
+@media (hover:hover) and (prefers-reduced-motion:no-preference) {
+ :where(.card,.feature-card,.tool-card,.stat-card,.quiz-card):hover {
+  transform:translateY(-3px); border-color:rgba(45,212,191,.35);
+  box-shadow:0 16px 40px -22px rgba(45,212,191,.32);
+ }
+}
+:where(input,textarea,select) {
+ transition:border-color .2s ease,box-shadow .2s ease;
+}
+:where(input,textarea,select):focus {
+ border-color:#2dd4bf;
+ box-shadow:0 0 0 3px rgba(45,212,191,.15);
+}
+:where(.btn,button) { transition:filter .2s ease,transform .2s ease; }
+@media (hover:hover) {
+ :where(.btn,button):not(:disabled):hover { filter:brightness(1.08); }
+}
