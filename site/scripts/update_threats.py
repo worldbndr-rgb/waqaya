@@ -125,6 +125,9 @@ def main():
     previous_lists = {entry["source"]: entry["urls"] for entry in previous.get("lists", [])
                       if isinstance(entry, dict) and "source" in entry and "urls" in entry}
     merged, failures, successes = [], [], 0
+    checked_at = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    source_status = {}
+    old_status = previous.get("sourceStatus", {})
     for source, mirrors in FEEDS:
         urls = None
         for url in mirrors:
@@ -137,6 +140,7 @@ def main():
         if urls is None:
             failures.append(source)
             urls = previous_lists.get(source, [])
+        source_status[source] = {"ok": source not in failures, "lastSuccessAt": checked_at if source not in failures else old_status.get(source, {}).get("lastSuccessAt"), "cached": source in failures}
         if urls:
             merged.append({"source": source, "urls": urls})
     extra_sources = [("phishunt", get_phishunt)]
@@ -147,10 +151,12 @@ def main():
             urls = loader()
             merged.append({"source": source, "urls": urls})
             successes += 1
+            source_status[source] = {"ok": True, "lastSuccessAt": checked_at, "cached": False}
         except Exception as exc:
             # Never log exception URLs: an authenticated feed URL contains a secret.
             print(f"{source}: unavailable ({type(exc).__name__})")
             failures.append(source)
+            source_status[source] = {"ok": False, "lastSuccessAt": old_status.get(source, {}).get("lastSuccessAt"), "cached": bool(previous_lists.get(source))}
             if previous_lists.get(source):
                 merged.append({"source": source, "urls": previous_lists[source]})
     if not successes:
@@ -160,6 +166,7 @@ def main():
     now = datetime.now(timezone.utc)
     snapshot = {
         "schema": 1,
+        "sourceStatus": source_status,
         "disabled": [] if URLHAUS_KEY else ["urlhaus: requires URLHAUS_AUTH_KEY"],
         "sourceInfo": {"openphish": {"homepage": "https://openphish.com/phishing_feeds.html", "cadence": "12 hours (community)"}, "phishdb": {"homepage": "https://github.com/Phishing-Database/Phishing.Database", "cadence": "upstream managed"}, "phishunt": {"homepage": "https://phishunt.io/feed/", "cadence": "hourly", "selection": "last 7 days, flagged by Google/OpenPhish/PhishTank according to Phishunt; not independently verified"}},
         "updatedAt": now.isoformat(timespec="seconds").replace("+00:00", "Z"),
