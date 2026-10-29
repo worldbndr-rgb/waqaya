@@ -276,7 +276,6 @@
   <div class="foot">تم توليد هذا التقرير تلقائياً من لوحة الرصد — منصّة الوقاية من التصيّد الاحتيالي.</div>
 </div>
 <script>setTimeout(function(){try{window.print()}catch(e){}},400)<\/script>
-  <script src="../js/enhancements.js" defer></script>
 </body></html>`;
       dl(`تقرير_نتائج_التدريب_${stamp()}.html`, 'text/html', html);
     });
@@ -336,5 +335,6 @@
     // تحديث تلقائي أثناء العرض عندما تأتي البيانات من مصدر مشترك
     if (ON_SERVER) setInterval(() => location.reload(), 20000);
   </script>
+<script src="../js/enhancements.js" defer></script>
 </body>
 </html>
